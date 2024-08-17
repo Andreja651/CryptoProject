@@ -1,0 +1,605 @@
+openapi: 3.0.0
+info:
+  title: Auth, COINAPI, Users, and Wallet API
+  description: API documentation for authentication, COINAPI endpoints, user management, and wallet operations.
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000
+
+paths:
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: User login
+      description: Authenticates a user and returns a token for future requests, this token is set in session for the user. Registration is closed, only way to create a new User is by the POST users method. The example below is a saved user from the DB.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: test2
+                password:
+                  type: string
+                  example: password2
+              required:
+                - username
+                - password
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: Authentication token
+        '401':
+          description: Unauthorized - Invalid credentials
+        '400':
+          description: Bad request - Missing or invalid input
+      security:
+        - bearerAuth: []
+  /auth/logout:
+    post:
+      tags:
+        - Auth
+      summary: User logout
+      description: Logs out the current user by invalidating the token.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful logout
+        '401':
+          description: Unauthorized - Invalid or missing token
+        '400':
+          description: Bad request - Possible malformed request
+
+  /crypto-info:
+    get:
+      tags:
+        - COINAPI
+      summary: Get Crypto Currency Info
+      description: Retrieves information about a specified cryptocurrency.
+      parameters:
+        - name: symbol_id
+          in: query
+          required: true
+          schema:
+            type: string
+          example: BTC
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful retrieval of cryptocurrency information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  symbol:
+                    type: string
+                    description: The cryptocurrency symbol
+                  price:
+                    type: number
+                    format: float
+                    description: The current price of the cryptocurrency
+        '401':
+          description: Unauthorized - Invalid or missing token
+        '400':
+          description: Bad request - Missing or invalid parameters
+
+  /users:
+    get:
+      tags:
+        - Users
+      summary: Get Users
+      description: Retrieves a list of all users.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful retrieval of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    username:
+                      type: string
+                    email:
+                      type: string
+        '401':
+          description: Unauthorized - Invalid or missing token
+
+    post:
+      tags:
+        - Users
+      summary: Create User
+      description: Creates a new user with the provided details.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: test2
+                email:
+                  type: string
+                  example: m1@mail.com
+                password:
+                  type: string
+                  example: password2
+              required:
+                - username
+                - email
+                - password
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful creation of user
+        '201':
+          description: User created
+        '400':
+          description: Bad request - Missing or invalid input
+
+  /users/{userId}:
+    get:
+      tags:
+        - Users
+      summary: Get User
+      description: Retrieves a specific user by ID.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful retrieval of user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  username:
+                    type: string
+                  email:
+                    type: string
+        '401':
+          description: Unauthorized - Invalid or missing token
+        '404':
+          description: Not Found - User not found
+          
+    put:
+      tags:
+        - Users
+      summary: Update User
+      description: Updates a specific user's details.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: newUsername
+              required:
+                - username
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful update of user
+        '201':
+          description: User updated
+        '204':
+          description: No Content - Successful update, no content returned
+        '400':
+          description: Bad request - Missing or invalid input
+        '404':
+          description: Not Found - User not found
+
+    delete:
+      tags:
+        - Users
+      summary: Delete User
+      description: Deletes a specific user by ID.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 5
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful deletion of user
+        '202':
+          description: Accepted - User deletion accepted
+        '204':
+          description: No Content - Successful deletion, no content returned
+        '400':
+          description: Bad request - Possible malformed request
+        '404':
+          description: Not Found - User not found
+          
+  /users/portfolio-value/{userId}:
+    get:
+      tags:
+        - Users
+      summary: Get Portfolio Value
+      description: Retrieves the portfolio value for a user in a specified currency.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+        - name: currency
+          in: query
+          required: true
+          schema:
+            type: string
+          example: GBP
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful retrieval of portfolio value
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: number
+                    format: float
+                    description: The value of the portfolio
+        '401':
+          description: Unauthorized - Invalid or missing token
+        '400':
+          description: Bad request - Missing or invalid parameters
+          
+
+  /wallets:
+    get:
+      tags:
+        - Wallet
+      summary: Get Wallets
+      description: Retrieves a list of wallets. Optionally, you can include query parameters to specify which wallets to retrieve.
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: integer
+          example: 1
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful retrieval of wallets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    user_id:
+                      type: integer
+                    currency:
+                      type: string
+        '401':
+          description: Unauthorized - Invalid or missing token
+        '400':
+          description: Bad request - Missing or invalid parameters
+
+    post:
+      tags:
+        - Wallet
+      summary: Create Wallet
+      description: Creates a new wallet with the provided details.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: integer
+                  example: 1
+                currency:
+                  type: string
+                  example: ETH
+              required:
+                - user_id
+                - currency
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful creation of wallet
+        '201':
+          description: Wallet created
+        '400':
+          description: Bad request - Missing or invalid input
+
+  /wallets/{walletId}:
+    get:
+      tags:
+        - Wallet
+      summary: Get Wallet
+      description: Retrieves a specific wallet by ID.
+      parameters:
+        - name: walletId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful retrieval of wallet
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  user_id:
+                    type: integer
+                  currency:
+                    type: string
+        '401':
+          description: Unauthorized - Invalid or missing token
+        '404':
+          description: Not Found - Wallet not found
+
+    put:
+      tags:
+        - Wallet
+      summary: Update Wallet
+      description: Updates a specific wallet's details.
+      parameters:
+        - name: walletId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 5
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                currency:
+                  type: string
+                  example: DGE
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful update of wallet
+        '201':
+          description: Wallet updated
+        '204':
+          description: No Content - Successful update, no content returned
+        '400':
+          description: Bad request - Missing or invalid input
+        '404':
+          description: Not Found - Wallet not found
+
+    delete:
+      tags:
+        - Wallet
+      summary: Delete Wallet
+      description: Deletes a specific wallet by ID.
+      parameters:
+        - name: walletId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 4
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful deletion of wallet
+        '202':
+          description: Accepted - Wallet deletion accepted
+        '204':
+          description: No Content - Successful deletion, no content returned
+        '400':
+          description: Bad request - Possible malformed request
+        '404':
+          description: Not Found - Wallet not found
+          
+  /transactions/{transactionId}:
+    get:
+      tags:
+        - Transactions
+      summary: Get Transaction
+      description: Retrieves a specific transaction by ID.
+      parameters:
+        - name: transactionId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 4
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful retrieval of transaction
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  user_id:
+                    type: integer
+                  transaction_type:
+                    type: string
+                  currency:
+                    type: string
+                  amount:
+                    type: string
+        '401':
+          description: Unauthorized - Invalid or missing token
+        '404':
+          description: Not Found - Transaction not found
+
+    put:
+      tags:
+        - Transactions
+      summary: Update Transaction
+      description: Updates a specific transaction's details.
+      parameters:
+        - name: transactionId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 4
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                currency:
+                  type: string
+                  example: ETH
+                amount:
+                  type: string
+                  example: "1122"
+              required:
+                - currency
+                - amount
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful update of transaction
+        '201':
+          description: Transaction updated
+        '204':
+          description: No Content - Successful update, no content returned
+        '400':
+          description: Bad request - Missing or invalid input
+        '404':
+          description: Not Found - Transaction not found
+
+    delete:
+      tags:
+        - Transactions
+      summary: Delete Transaction
+      description: Deletes a specific transaction by ID.
+      parameters:
+        - name: transactionId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 4
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful deletion of transaction
+        '202':
+          description: Accepted - Transaction deletion accepted
+        '204':
+          description: No Content - Successful deletion, no content returned
+        '400':
+          description: Bad request - Possible malformed request
+        '404':
+          description: Not Found - Transaction not found
+
+  /transactions:
+    post:
+      tags:
+        - Transactions
+      summary: Post Transaction
+      description: Creates a new transaction with the provided details.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: integer
+                  example: 1
+                transaction_type:
+                  type: string
+                  example: purchase
+                currency:
+                  type: string
+                  example: BTC
+                amount:
+                  type: string
+                  example: "4"
+              required:
+                - user_id
+                - transaction_type
+                - currency
+                - amount
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful creation of transaction
+        '201':
+          description: Transaction created
+        '400':
+          description: Bad request - Missing or invalid input
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

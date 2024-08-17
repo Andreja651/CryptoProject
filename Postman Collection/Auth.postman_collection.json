@@ -1,0 +1,72 @@
+{
+	"info": {
+		"_postman_id": "ec5e2e94-be87-4160-a9c0-0da0b0b30c35",
+		"name": "Auth",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "36975288"
+	},
+	"item": [
+		{
+			"name": "login",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcyMDk1NzU5MCwianRpIjoiMWY3N2QwZTctMzRhYS00MzBlLTk0OWUtMmZhNTE2MmJkZjMwIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6InVzZXIxIiwibmJmIjoxNzIwOTU3NTkwLCJjc3JmIjoiOTAzNTEzNzMtZjE3YS00NzI4LWJkNjUtMDhiYjYxNTJkZTAyIiwiZXhwIjoxNzIwOTYxMTkwfQ.vvTSdsrc5SNqQ0fd3FmZbQGuYbO9v8gWVoETYnixqfw",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"test1\",\r\n    \"password\":\"asd1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "logout",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcyMDk1NzU5MCwianRpIjoiMWY3N2QwZTctMzRhYS00MzBlLTk0OWUtMmZhNTE2MmJkZjMwIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6InVzZXIxIiwibmJmIjoxNzIwOTU3NTkwLCJjc3JmIjoiOTAzNTEzNzMtZjE3YS00NzI4LWJkNjUtMDhiYjYxNTJkZTAyIiwiZXhwIjoxNzIwOTYxMTkwfQ.vvTSdsrc5SNqQ0fd3FmZbQGuYbO9v8gWVoETYnixqfw",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/auth/logout",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"auth",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
